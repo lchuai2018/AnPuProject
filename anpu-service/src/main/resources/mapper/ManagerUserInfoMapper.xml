@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.anpuservice.mapper.ManagerUserInfoMapper">
+  <resultMap id="BaseResultMap" type="com.example.anpuservice.model.ManagerUserInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="account_number" jdbcType="VARCHAR" property="accountNumber" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="head_img" jdbcType="VARCHAR" property="headImg" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="create_user_id" jdbcType="INTEGER" property="createUserId" />
+    <result column="last_login_ip" jdbcType="VARCHAR" property="lastLoginIp" />
+    <result column="last_login_time" jdbcType="TIMESTAMP" property="lastLoginTime" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+
+
+  <select id="findManagerByAccountNumber" parameterType="java.lang.String" resultMap="BaseResultMap">
+    SELECT
+      *
+    FROM manager_user_info
+    WHERE account_number = #{accountNumber}
+  </select>
+
+  <select id="findAllManagersList" resultType="com.example.anpuservice.vo.ManagerUserInfoRespVO">
+    SELECT
+    manager_user_info.id AS id,
+    manager_user_info.`account_number` AS accountNumber,
+    manager_user_info.`name` AS `name`,
+    `manager_user_info`.`email` AS email,
+    manager_user_info.`phone` AS phone,
+    manager_user_info.`status` AS `status`,
+    manager_user_role.`role_id` AS roleId,
+    manager_role_info.`role_name` AS roleName,
+    DATE_FORMAT(`manager_user_info`.`last_login_time` , '%Y-%m-%d %H:%i:%s') AS lastLoginTime,
+    `manager_user_info`.`last_login_ip` AS lastLoginIp,
+    DATE_FORMAT(manager_user_info.`create_time` , '%Y-%m-%d %H:%i:%s') as createTime
+    FROM
+    `manager_user_info`
+    LEFT JOIN `manager_user_role` ON `manager_user_info`.`id` = manager_user_role.`user_id` AND
+    manager_user_role.`status` = '1'
+    LEFT JOIN `manager_role_info` ON `manager_user_role`.`role_id` = `manager_role_info`.`id` AND
+    `manager_role_info`.`status` = '1'
+    WHERE 1=1
+    <if test="name!=null and name!=''">
+      AND manager_user_info.`name` = #{name}
+    </if>
+    <if test="status!=null">
+      AND manager_user_info.status = #{status}
+    </if>
+    <if test="roleIds != null and roleIds">
+      AND manager_user_role.`role_id` = #{roleIds}
+    </if>
+    ORDER BY `manager_user_info`.id
+  </select>
+
+
+
+  <update id="updateUserLoginPassword">
+    UPDATE
+      `manager_user_info`
+    SET
+      `manager_user_info`.`password` = #{newPassword}
+    WHERE `manager_user_info`.`id` = #{userId}
+      AND `manager_user_info`.`password` = #{oldPassword}
+  </update>
+
+</mapper>

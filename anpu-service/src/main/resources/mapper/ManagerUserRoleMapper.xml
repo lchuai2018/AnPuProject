@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.anpuservice.mapper.ManagerUserRoleMapper">
+  <resultMap id="BaseResultMap" type="com.example.anpuservice.model.ManagerUserRole">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="created_manager_id" jdbcType="INTEGER" property="createdManagerId" />
+    <result column="role_id" jdbcType="INTEGER" property="roleId" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+
+
+
+  <select id="findByManagerUserId" resultMap="BaseResultMap">
+    SELECT
+      *
+    FROM manager_user_role
+    WHERE user_id = #{managerUserId}
+      AND manager_user_role.status = '1'
+  </select>
+
+  <select id="queryAllUserPowerKeys" parameterType="java.lang.Integer" resultType="java.lang.String">
+    SELECT
+    manager_power_info.`power_key`
+    FROM
+    `manager_user_role`
+    LEFT JOIN `manager_role_power` ON `manager_user_role`.`role_id` = `manager_role_power`.`role_id`
+    LEFT JOIN `manager_power_info` ON `manager_role_power`.`power_id` = `manager_power_info`.`id`
+    WHERE `manager_user_role`.`status` = '1'
+    AND `manager_role_power`.`status` = '1'
+    AND `manager_power_info`.`status` = '1'
+    AND (`manager_power_info`.`power_key` IS NOT NULL OR `manager_power_info`.`power_key` != '')
+    <if test="userId != '' and userId != null and userId != '1'">
+      AND `manager_user_role`.`user_id` = #{userId}
+    </if>
+  </select>
+</mapper>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.anpuservice.mapper.ManagerMenuInfoMapper">
+  <resultMap id="BaseResultMap" type="com.example.anpuservice.model.ManagerMenuInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="parent_id" jdbcType="INTEGER" property="parentId" />
+    <result column="menu_name" jdbcType="VARCHAR" property="menuName" />
+    <result column="icon" jdbcType="VARCHAR" property="icon" />
+    <result column="power_url" jdbcType="VARCHAR" property="powerUrl" />
+    <result column="menu_type" jdbcType="INTEGER" property="menuType" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="order_num" jdbcType="INTEGER" property="orderNum" />
+    <result column="create_user_id" jdbcType="INTEGER" property="createUserId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+
+
+
+  <select id="queryListByParentId" resultType="com.example.anpuservice.vo.MenuInfoVO">
+    SELECT
+      manager_menu_info.`id` as menuId,
+      manager_menu_info.`parent_id` as parentId,
+      manager_menu_info.`menu_name` as menuName,
+      IFNULL(manager_menu_info.`power_url`,'') as powerUrl,
+      manager_menu_info.`menu_type` as menuType,
+      manager_menu_info.`order_num` as orderNum,
+      manager_menu_info.`icon` as icon,
+      manager_menu_info.`status` as `status`
+    FROM
+      manager_menu_info
+    WHERE parent_id = #{parentId}
+      AND `status` = 1
+    ORDER BY order_num DESC
+  </select>
+
+  <!-- 根据已知子菜单id查询父菜单id -->
+  <select id="selectParentIdList" parameterType="java.util.List" resultType="Integer">
+    SELECT
+    DISTINCT `manager_menu_info`.`parent_id`
+    FROM
+    `manager_menu_info`
+    WHERE
+    `manager_menu_info`.`parent_id` != '0'
+    <if test="idList != null and idList.size() &gt; 0">
+      AND `manager_menu_info`.`id` IN
+      <foreach close=")" collection="idList" item="menuId" open="(" separator=",">
+        #{menuId}
+      </foreach>
+    </if>
+  </select>
+
+
+  <select id="selectMenuInfoList" resultMap="BaseResultMap">
+    SELECT
+    *
+    FROM
+    `manager_menu_info`
+    WHERE 1 = 1
+    <if test="parentMenuId != null">
+      AND (`manager_menu_info`.`id` = #{parentMenuId} OR `manager_menu_info`.`parent_id` = #{parentMenuId})
+    </if>
+    <if test="menuName != null and menuName != ''">
+      AND `manager_menu_info`.`menu_name` = #{menuName}
+    </if>
+    <if test="status != null">
+      AND `manager_menu_info`.`status` = #{status}
+    </if>
+    <if test="menuType != null">
+      AND `manager_menu_info`.`menu_type` = #{menuType}
+    </if>
+  </select>
+
+
+</mapper>

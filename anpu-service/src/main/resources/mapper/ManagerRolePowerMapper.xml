@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.anpuservice.mapper.ManagerRolePowerMapper">
+  <resultMap id="BaseResultMap" type="com.example.anpuservice.model.ManagerRolePower">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="role_id" jdbcType="INTEGER" property="roleId" />
+    <result column="power_id" jdbcType="INTEGER" property="powerId" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="create_user_id" jdbcType="INTEGER" property="createUserId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+
+  <select id="findCurrentLoginMenuIDList" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+    SELECT
+      DISTINCT manager_menu_power.`menu_id`
+    FROM
+      `manager_user_role`
+        LEFT JOIN `manager_role_power` ON  manager_user_role.`role_id` = `manager_role_power`.`role_id` AND `manager_role_power`.`status` = '1'
+        LEFT JOIN `manager_menu_power` ON `manager_role_power`.`power_id` = `manager_menu_power`.`power_id`  AND `manager_menu_power`.`status` = '1'
+    WHERE `manager_user_role`.`status` = '1'
+      AND manager_user_role.`user_id` = #{userId}
+  </select>
+
+
+  <select id="findPowerIdList" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+    SELECT
+      manager_role_power.`power_id`
+    FROM
+      `manager_role_power`  LEFT JOIN `manager_role_info` ON `manager_role_power`.`role_id` = `manager_role_info`.`id`
+    WHERE `manager_role_power`.`status` = '1'
+      AND `manager_role_info`.`status` = '1'
+      AND `manager_role_info`.`id` = #{roleId}
+  </select>
+</mapper>

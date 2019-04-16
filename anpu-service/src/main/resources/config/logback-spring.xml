@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false" scan="true" scanPeriod="10 seconds">
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <appender name="bussinesslog-appender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/aupu-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>1024MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%date %level [%thread] %logger{10} [%file:%line] - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="bussinesslog-async" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>80</discardingThreshold>
+        <queueSize>512</queueSize>
+        <neverBlock>true</neverBlock>
+        <appender-ref ref="bussinesslog-appender"/>
+    </appender>
+
+    <logger name="com.example.anpuservice" level="debug">
+        <appender-ref ref="bussinesslog-async"/>
+    </logger>
+
+    <logger name="com.example.anpuservice.mapper" level="debug">
+        <appender-ref ref="bussinesslog-async"/>
+    </logger>
+
+</configuration>

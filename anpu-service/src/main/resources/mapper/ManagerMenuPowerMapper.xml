@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.anpuservice.mapper.ManagerMenuPowerMapper">
+  <resultMap id="BaseResultMap" type="com.example.anpuservice.model.ManagerMenuPower">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <result column="id" jdbcType="INTEGER" property="id" />
+    <result column="menu_id" jdbcType="INTEGER" property="menuId" />
+    <result column="power_id" jdbcType="INTEGER" property="powerId" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="create_user_id" jdbcType="INTEGER" property="createUserId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+
+  <select id="selectMenuPowerByMenuId" resultType="com.example.anpuservice.vo.PowerInsertInfoVO">
+    SELECT
+    manager_power_info.id
+    , manager_power_info.`power_key` AS powerKey
+    , manager_power_info.`power_name` AS powerName
+    , manager_power_info.`status` AS `powerStatus`
+    FROM
+    `manager_menu_power` LEFT JOIN `manager_power_info` ON `manager_menu_power`.`power_id` = `manager_power_info`.`id`
+    WHERE
+    `manager_menu_power`.`status` = '1'
+    AND `manager_power_info`.`status` = '1'
+    AND `manager_power_info`.`power_key` NOT LIKE '%:all'
+    <if test="menuId != null and menuId != ''">
+      AND `manager_menu_power`.`menu_id` = #{menuId}
+    </if>
+  </select>
+  <select id="selectPowerIdListByMenuId" resultType="java.lang.Integer">
+    SELECT
+      manager_power_info.id
+    FROM
+      `manager_menu_power`  LEFT JOIN `manager_power_info` ON `manager_menu_power`.`power_id` = `manager_power_info`.`id`
+    WHERE
+      `manager_menu_power`.`status` = '1'
+      AND `manager_power_info`.`status` = '1'
+      AND `manager_menu_power`.`menu_id` = #{menuId}
+  </select>
+
+  <select id="selectPowerIsExistByPowerKey" resultMap="BaseResultMap">
+    SELECT
+    manager_menu_power.*
+    FROM
+    `manager_menu_power`
+    LEFT JOIN `manager_power_info` ON `manager_menu_power`.`power_id` = `manager_power_info`.`id`
+    WHERE
+    1=1
+    <if test="id != null and id != ''">
+      AND `manager_menu_power`.`menu_id` != #{id}
+    </if>
+    <if test="powerKey != null and powerKey != ''">
+      AND `manager_power_info`.`power_key` = #{powerKey}
+    </if>
+  </select>
+
+  <select id="findAllPowerIdListByMenuId" resultType="java.lang.Integer">
+    SELECT
+      manager_menu_power.`power_id`
+    FROM `manager_menu_power`
+    WHERE `manager_menu_power`.`menu_id` = #{menuId}
+  </select>
+
+  <select id="selectMenuPowerByParentId" parameterType="java.lang.Integer"
+          resultType="com.example.anpuservice.vo.MenuInfoVO">
+    SELECT
+      manager_power_info.id,
+      manager_power_info.`power_key` as powerKey,
+      manager_power_info.`power_name` as powerName,
+      manager_menu_info.`id` AS menuId,
+      manager_menu_info.`menu_name` AS menuName,
+      manager_menu_info.`icon`,
+      IFNULL(manager_menu_info.`power_url`,'') AS powerUrl,
+      manager_menu_info.`menu_type` AS menuType
+    FROM
+      `manager_menu_power`
+        LEFT JOIN `manager_menu_info`
+                  ON `manager_menu_power`.`menu_id` = `manager_menu_info`.`id`
+        LEFT JOIN `manager_power_info`
+                  ON `manager_menu_power`.`power_id` = `manager_power_info`.`id`
+    WHERE `manager_menu_info`.`parent_id` = #{parentId}
+      AND `manager_menu_info`.`status` = '1'
+      AND `manager_menu_power`.`status` = '1'
+      AND `manager_power_info`.`status` = '1'
+  </select>
+</mapper>

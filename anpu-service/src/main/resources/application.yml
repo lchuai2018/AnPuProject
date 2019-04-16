@@ -1,0 +1,32 @@
+server:
+  port: 8005
+# 环境 开发&预生产dev|生产prod
+spring:
+    profiles:
+        active: dev
+    jackson:
+        date-format: yyyy-MM-dd HH:mm:ss
+        time-zone: GMT+8
+
+# 跨域CORS
+app:
+  cors:
+     allowed-origins: "*"
+     allowed-methods: GET, PUT, POST, DELETE, OPTIONS
+     allowed-headers: "*"
+     allow-credentials: true
+     max-age: 1800
+
+mapper:
+  #mappers: com.iyingke.riskbackstage.mapper
+  not-empty: false
+  identity: MYSQL
+
+#mybatis
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml
+  type-aliases-package: com.example.anpuservice.model
+
+jasypt:
+  encryptor:
+    password: gfpO^MLPhF*AmwdT
